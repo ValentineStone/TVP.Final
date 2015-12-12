@@ -7,11 +7,15 @@ HANDLE ghSemaphore;
 DWORD WINAPI ThreadProc(LPVOID);
 
 int main() {
+    system("@color 47");
+
     int THREADCOUNT;
 
-    std::printf("How many fiery rockets we need general?: ");
+    std::printf("---------------------------------------------------\n");
+    std::printf("---------------------------------------------------\n");
+    std::printf("How many fiery rockets we need, General?: ");
     std::scanf("%d", &THREADCOUNT);
-
+    std::printf("---------------------------------------------------\n");
 
     HANDLE aThread[THREADCOUNT];
     DWORD ThreadID;
@@ -82,15 +86,7 @@ DWORD WINAPI ThreadProc(LPVOID lpParam) {
 
     // Fire on response
 
-    std::string sCommand;
-
-    sCommand += "START ECHO \"Soldier #";
-    char lpchCurrentThreadId[100];
-    std::sprintf (lpchCurrentThreadId, "%d", GetCurrentThreadId());
-    sCommand += lpchCurrentThreadId;
-    sCommand += ": FIYAAAAA!\"\n";
-
-    system(sCommand.c_str());
+    system("start bin\\Release\\Soldier.exe");
 
     return 0;
 
