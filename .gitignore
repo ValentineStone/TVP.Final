@@ -1,0 +1,9 @@
+# C++ executables
+
+/bin
+/obj
+
+# Code::Blocks files
+
+*.layout
+*.depend
