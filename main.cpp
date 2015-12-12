@@ -1,27 +1,30 @@
 #include <cstdio>
+#include <string>
 #include <windows.h>
-
-#define MAX_SEM_COUNT 12
-#define THREADCOUNT 12
 
 HANDLE ghSemaphore;
 
 DWORD WINAPI ThreadProc(LPVOID);
 
 int main() {
+    int THREADCOUNT;
+
+    std::printf("How many fiery rockets we need general?: ");
+    std::scanf("%d", &THREADCOUNT);
+
+
     HANDLE aThread[THREADCOUNT];
     DWORD ThreadID;
     int i;
-
-    // Create semaphore with initial and max counts of MAX_SEM_COUNT
+    // Create semaphore with initial count of 0 and max count of MAX_SEM_COUNT
 
     ghSemaphore = CreateSemaphore(
                                   NULL,
-                                  MAX_SEM_COUNT,
-                                  MAX_SEM_COUNT,
+                                  0,
+                                  THREADCOUNT,
                                   NULL);
     if (ghSemaphore == NULL) {
-        std::printf("CreateSemaphore error: %d\n",GetLastError());
+        std::printf("CreateSemaphore error: %d\n", GetLastError());
         return 1;
     }
 
@@ -36,9 +39,19 @@ int main() {
                                   0,
                                   &ThreadID);
         if (aThread[i] == NULL) {
-            std::printf("CreateThread error: %d\n",GetLastError());
+            std::printf("CreateThread error: %d\n", GetLastError());
             return 1;
         }
+    }
+
+    // 3... 2... 1... GO! all threads are commanded to run
+
+    if (!ReleaseSemaphore(
+                      ghSemaphore,
+                      THREADCOUNT,
+                      NULL))
+    {
+        std::printf("ReleaseSemaphore error: %d\n", GetLastError());
     }
 
     // Wait for all threads to terminate
@@ -60,43 +73,25 @@ DWORD WINAPI ThreadProc(LPVOID lpParam) {
     UNREFERENCED_PARAMETER(lpParam);
 
     DWORD dwWaitResult;
-    BOOL bContinue = TRUE;
 
-    while(bContinue) {
+    //Try to enter semaphore gate.
 
-        //Try to enter semaphore gate.
+    dwWaitResult = WaitForSingleObject(
+                                       ghSemaphore,
+                                       INFINITE);
 
-        dwWaitResult = WaitForSingleObject(
-                                           ghSemaphore,
-                                           INFINITE);
-        switch (dwWaitResult) {
+    // Fire on response
 
-            // The semaphore object was signaled
-            case WAIT_OBJECT_0:
-                // TODO: Preform task
-                std::printf("Thread %d: wait succeeded\n",GetCurrentThreadId());
+    std::string sCommand;
 
-                bContinue = FALSE;
+    sCommand += "START ECHO \"Soldier #";
+    char lpchCurrentThreadId[100];
+    std::sprintf (lpchCurrentThreadId, "%d", GetCurrentThreadId());
+    sCommand += lpchCurrentThreadId;
+    sCommand += ": FIYAAAAA!\"\n";
 
-                // Simulate thread spending time on task
-                Sleep(500);
+    system(sCommand.c_str());
 
-                // Release the semaphore when task is finished
-
-                if (!ReleaseSemaphore(
-                                      ghSemaphore,
-                                      1,
-                                      NULL)) {
-                    std::printf("ReleaseSemaphore error: %d\n",GetLastError());
-                }
-                break;
-
-            // The semaphore was nonsignaled, so a time-out occurred.
-            case WAIT_TIMEOUT:
-                std::printf("Thread %d: wait timed out\n",GetCurrentThreadId());
-                break;
-        }
-    }
-    return TRUE;
+    return 0;
 
 }
