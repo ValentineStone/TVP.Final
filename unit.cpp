@@ -3,6 +3,11 @@
 #include <cstring>
 #include <windows.h>
 
+/*
+    To compile use C++11 standard due to usage of std::to_string(), thanks ;)
+*/
+
+
 #define SLEEP_TIME 1
 #define DELAY 0
 
