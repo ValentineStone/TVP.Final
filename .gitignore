@@ -1,6 +1,6 @@
 # C++ executables
 
-/bin
+#/bin
 /obj
 
 # Code::Blocks files
